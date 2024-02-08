@@ -15,7 +15,7 @@ import com.example.testaccelerometrekotlin.databinding.MainBinding
 
 class TestAccelerometreActivity : Activity(), SensorEventListener {
 
-    private var sensorManager: SensorManager? = null
+    private lateinit var sensorManager: SensorManager
     private var color = false
     private lateinit var view: TextView
     private var lastUpdate: Long = 0
@@ -31,9 +31,9 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         view = binding.textView
         view.setBackgroundColor(Color.GREEN)
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensorManager?.registerListener(
+        sensorManager.registerListener(
             this,
-            sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+            sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
             SensorManager.SENSOR_DELAY_NORMAL
         )
         // register this class as a listener for the accelerometer sensor
@@ -75,6 +75,6 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
     override fun onPause() {
         // unregister listener
         super.onPause()
-        sensorManager?.unregisterListener(this)
+        sensorManager.unregisterListener(this)
     }
 }
