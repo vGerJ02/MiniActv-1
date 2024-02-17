@@ -2,4 +2,5 @@
     <string name="app_name">TestAccelerometreKotlin</string>
     <string name="shake">Shake to get a toast and to switch color</string>
     <string name="shuffed">Device was shuffed</string>
+    <string name="no_accel">Sorry, there is no accelerometer</string>
 </resources>

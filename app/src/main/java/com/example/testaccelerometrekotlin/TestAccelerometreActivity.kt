@@ -36,18 +36,21 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         view3 = binding.textView3
 
         view1.setBackgroundColor(Color.GREEN)
-        view2.setBackgroundColor(Color.YELLOW)
+        view2.setBackgroundColor(Color.WHITE)
         view3.setBackgroundColor(Color.CYAN)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        val accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
-        sensorManager.registerListener(
-            this,
-            accel,
-            SensorManager.SENSOR_DELAY_NORMAL
-        )
+        if (accelerometer != null) {
+            view2.text = this.getString(R.string.shake)
+            sensorManager.registerListener(
+                this,
+                accelerometer,
+                SensorManager.SENSOR_DELAY_NORMAL
+            )
+        }
         // register this class as a listener for the accelerometer sensor
         lastUpdate = System.currentTimeMillis()
     }
@@ -70,7 +73,7 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
                 return
             }
             lastUpdate = actualTime
-            Toast.makeText(this, R.string.shuffed, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, R.string.shuffed, Toast.LENGTH_SHORT).show()
             if (color) {
                 view1.setBackgroundColor(Color.GREEN)
             } else {
