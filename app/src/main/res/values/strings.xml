@@ -3,4 +3,8 @@
     <string name="shake">Shake to get a toast and to switch color</string>
     <string name="shuffed">Device was shuffed</string>
     <string name="no_accel">Sorry, there is no accelerometer</string>
+    <string name="new_light_value">"New value light sensor = </string>
+    <string name="light_intensity_low">LOW</string>
+    <string name="light_intensity_medium">MEDIUM</string>
+    <string name="light_intensity_high">HIGH</string>
 </resources>

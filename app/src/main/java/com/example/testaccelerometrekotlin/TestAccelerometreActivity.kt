@@ -9,18 +9,20 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import com.example.testaccelerometrekotlin.databinding.MainBinding
+import kotlin.math.abs
 
 
 class TestAccelerometreActivity : Activity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
-    private var color = false
+    private var color: Boolean = false
+    private var maxLight: Float = 0F
+    private var oldLightLevel: Float = 0F
+    private var lastUpdate: Long = 0
     private lateinit var view1: TextView
     private lateinit var view2: TextView
     private lateinit var view3: TextView
-    private var lastUpdate: Long = 0
 
     private lateinit var binding: MainBinding
 
@@ -36,13 +38,10 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         view3 = binding.textView3
 
         view1.setBackgroundColor(Color.GREEN)
-        view2.setBackgroundColor(Color.WHITE)
-        view3.setBackgroundColor(Color.CYAN)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-
         if (accelerometer != null) {
             view2.text = this.getString(R.string.shake)
             sensorManager.registerListener(
@@ -51,12 +50,28 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
                 SensorManager.SENSOR_DELAY_NORMAL
             )
         }
+
+        val light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+        if (light != null) {
+            view3.setBackgroundColor(Color.YELLOW)
+            sensorManager.registerListener(
+                this,
+                light,
+                SensorManager.SENSOR_DELAY_UI
+            )
+        }
         // register this class as a listener for the accelerometer sensor
         lastUpdate = System.currentTimeMillis()
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        getAccelerometer(event)
+        when (event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER ->
+                getAccelerometer(event)
+
+            Sensor.TYPE_LIGHT ->
+                getLight(event)
+        }
     }
 
     private fun getAccelerometer(event: SensorEvent) {
@@ -83,6 +98,34 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         }
     }
 
+    private fun getLight(event: SensorEvent) {
+        val actualTime = System.currentTimeMillis()
+        if (actualTime - lastUpdate < 1000) return
+
+        maxLight = event.sensor.maximumRange
+        val lightLevel = event.values[0]
+        val lowThresholdLight = maxLight / 3
+        val highThresholdLight = maxLight * 2 / 3
+
+        if (abs(lightLevel - oldLightLevel) >= 200) {
+            oldLightLevel = lightLevel
+
+            view3.text = buildString {
+                append(getString(R.string.new_light_value))
+                append(" $lightLevel\n")
+
+                when {
+                    lightLevel < lowThresholdLight -> append(getString(R.string.light_intensity_low))
+                    lightLevel > highThresholdLight -> append(getString(R.string.light_intensity_high))
+                    else -> append(getString(R.string.light_intensity_medium))
+                }
+
+                append(" Intensity")
+            }
+
+        }
+    }
+
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
         // Do something here if sensor accuracy changes.
     }
@@ -90,6 +133,7 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
     override fun onPause() {
         // unregister listener
         super.onPause()
+        // This will unregister all listeners registered on `this`
         sensorManager.unregisterListener(this)
     }
 }
