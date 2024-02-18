@@ -37,9 +37,22 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         view2 = binding.textView2
         view3 = binding.textView3
 
-        view1.setBackgroundColor(Color.GREEN)
+        if (savedInstanceState != null) {
+            color = savedInstanceState.getBoolean(
+                "savedColor",
+                false
+            ) // retrieve saved color or use default
+        }
+        view1.setBackgroundColor(if (!color) Color.GREEN else Color.RED)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+
+        // register this class as a listener for the accelerometer sensor
+        lastUpdate = System.currentTimeMillis()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometer != null) {
@@ -57,11 +70,15 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
             sensorManager.registerListener(
                 this,
                 light,
-                SensorManager.SENSOR_DELAY_UI
+                SensorManager.SENSOR_DELAY_NORMAL
             )
         }
-        // register this class as a listener for the accelerometer sensor
-        lastUpdate = System.currentTimeMillis()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // This will unregister all listeners registered on `this`
+        sensorManager.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent) {
@@ -130,10 +147,9 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
         // Do something here if sensor accuracy changes.
     }
 
-    override fun onPause() {
-        // unregister listener
-        super.onPause()
-        // This will unregister all listeners registered on `this`
-        sensorManager.unregisterListener(this)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("savedColor", color) // save current color
     }
+
 }
