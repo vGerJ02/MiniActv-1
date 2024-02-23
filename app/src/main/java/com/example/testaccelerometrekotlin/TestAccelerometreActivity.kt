@@ -16,8 +16,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import com.example.testaccelerometrekotlin.ui.SensorViewModel
@@ -40,39 +45,8 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
 
         setContent {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize() // Fill the entire parent container
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth() // Fill the entire width
-                        .weight(2f)
-                        .background(color = Color.Green)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth() // Fill the entire width
-                        .weight(2f)
-                        .background(color = Color.White)
-                ) {
-                    Text(
-                        text = sensorViewModel.accelerometreInfo.value ?: "",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth() // Fill the entire width
-                        .weight(1f)
-                        .background(color = Color.Yellow)
-                )
-            }
+            UserInterface()
         }
-
-        val sensorObserver =
-            Observer<String> { newValue ->  }
-        sensorViewModel.accelerometreInfo.observe(this, sensorObserver)
 
         sensorViewModel.changeAccelerometreInfo("Not detected")
 
@@ -88,6 +62,38 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
 
         // register this class as a listener for the accelerometer sensor
         lastUpdate = System.currentTimeMillis()
+    }
+
+    @Preview
+    @Composable
+    fun UserInterface() {
+        Column (
+            modifier = Modifier.
+            fillMaxSize()
+
+        ){
+
+            Box(modifier = Modifier
+                .fillMaxWidth() // Fill the entire width
+                .weight(2f)
+                .background(color = Color.Green)) {
+                Text("Hello World")
+            }
+
+            Box(modifier = Modifier
+                .fillMaxWidth() // Fill the entire width
+                .weight(2f)
+                .background(color = Color.Yellow)) {
+                Text("Hello World")
+            }
+
+            Box(modifier = Modifier
+                .fillMaxWidth() // Fill the entire width
+                .weight(2f)
+                .background(color = Color.White)) {
+                Text("Hello World")
+            }
+        }
     }
 
     override fun onResume() {
