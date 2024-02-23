@@ -1,30 +1,32 @@
 package com.example.testaccelerometrekotlin.ui
 
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class SensorViewModel : ViewModel() {
 
-    private val _accelerometreInfo = MutableStateFlow<String>("")
-    val accelerometreInfo : StateFlow<String> = _accelerometreInfo.asStateFlow()
-
-    private val _lightInfo = MutableStateFlow<String>("")
-    val lightInfo : StateFlow<String> = _lightInfo.asStateFlow()
-
-    private val _boxColor = MutableStateFlow<Color>(Color.Green)
-    val boxColor : StateFlow<Color> = _boxColor.asStateFlow()
-
-    fun changeLightInfo(newValue: String){
-        _lightInfo.value = _lightInfo.value + "\n" + newValue
-    }
-    fun changeAccelerometreInfo(newValue: String){
-        _accelerometreInfo.value = newValue
+    val accelerometreInfo: MutableLiveData<String> by lazy {
+        MutableLiveData<String>("")
     }
 
-    fun setBoxColor(newValue: Color){
-        _boxColor.value = newValue
+    val lightInfo: MutableLiveData<String> by lazy {
+        MutableLiveData<String>("")
+    }
+
+    val boxColor: MutableLiveData<Color> by lazy {
+        MutableLiveData<Color>(Color.Green)
+    }
+
+    fun changeLightInfo(newValue: String) {
+        lightInfo.value = lightInfo.value + "\n" + newValue
+    }
+
+    fun changeAccelerometreInfo(newValue: String) {
+        accelerometreInfo.value = newValue
+    }
+
+    fun setBoxColor(newValue: Color) {
+        boxColor.value = newValue
     }
 }

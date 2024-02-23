@@ -19,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -87,7 +89,7 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                 modifier = Modifier
                     .fillMaxWidth() // Fill the entire width
                     .weight(2f)
-                    .background(color = sensorViewModel.boxColor.collectAsState().value)
+                    .background(color = sensorViewModel.boxColor.observeAsState(Color.Green).value)
             ) {
             }
 
@@ -97,7 +99,7 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                     .weight(2f)
                     .background(color = Color.White)
             ) {
-                Text(sensorViewModel.accelerometreInfo.collectAsState().value)
+                Text(sensorViewModel.accelerometreInfo.observeAsState("").value)
             }
 
             Box(
@@ -107,7 +109,7 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                     .background(color = Color.Yellow)
             ) {
                 Text(
-                    sensorViewModel.lightInfo.collectAsState().value,
+                    sensorViewModel.lightInfo.observeAsState("").value,
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 )
 
