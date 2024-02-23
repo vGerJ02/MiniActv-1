@@ -15,16 +15,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Text
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import com.example.testaccelerometrekotlin.ui.SensorViewModel
 import kotlin.math.abs
 
@@ -40,6 +37,7 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
 
     private val sensorViewModel: SensorViewModel by viewModels()
 
+
     /** Called when the activity is first created.  */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,77 +46,75 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
             UserInterface()
         }
 
-        sensorViewModel.changeAccelerometreInfo("Not detected")
-
-        if (savedInstanceState != null) {
-            color = savedInstanceState.getBoolean(
-                "savedColor",
-                false
-            ) // retrieve saved color or use default
-        }
-//        view1.setBackgroundColor(if (!color) Color.GREEN else Color.RED)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
-        // register this class as a listener for the accelerometer sensor
-        lastUpdate = System.currentTimeMillis()
-    }
-
-    @Preview
-    @Composable
-    fun UserInterface() {
-        Column (
-            modifier = Modifier.
-            fillMaxSize()
-
-        ){
-
-            Box(modifier = Modifier
-                .fillMaxWidth() // Fill the entire width
-                .weight(2f)
-                .background(color = Color.Green)) {
-                Text("Hello World")
-            }
-
-            Box(modifier = Modifier
-                .fillMaxWidth() // Fill the entire width
-                .weight(2f)
-                .background(color = Color.Yellow)) {
-                Text("Hello World")
-            }
-
-            Box(modifier = Modifier
-                .fillMaxWidth() // Fill the entire width
-                .weight(2f)
-                .background(color = Color.White)) {
-                Text("Hello World")
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometer != null) {
-//            view2.text = this.getString(R.string.shake)
+            sensorViewModel.changeAccelerometreInfo(getString(R.string.shake))
             sensorManager.registerListener(
                 this,
                 accelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL
             )
+        } else {
+            sensorViewModel.changeAccelerometreInfo(getString(R.string.no_accel))
         }
 
         val light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
         if (light != null) {
-//            view3.setBackgroundColor(Color.YELLOW)
+
             sensorManager.registerListener(
                 this,
                 light,
                 SensorManager.SENSOR_DELAY_NORMAL
             )
         }
+        // register this class as a listener for the accelerometer sensor
+        lastUpdate = System.currentTimeMillis()
+
     }
+
+    @Preview
+    @Composable
+    fun UserInterface() {
+        Column(
+            modifier = Modifier.fillMaxSize()
+
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Fill the entire width
+                    .weight(2f)
+                    .background(color = sensorViewModel.boxColor.collectAsState().value)
+            ) {
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Fill the entire width
+                    .weight(2f)
+                    .background(color = Color.White)
+            ) {
+                Text(sensorViewModel.accelerometreInfo.collectAsState().value)
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth() // Fill the entire width
+                    .weight(1f)
+                    .background(color = Color.Yellow)
+            ) {
+                Text(
+                    sensorViewModel.lightInfo.collectAsState().value,
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )
+
+            }
+        }
+    }
+
 
     override fun onPause() {
         super.onPause()
@@ -150,12 +146,12 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                 return
             }
             lastUpdate = actualTime
-            sensorViewModel.changeAccelerometreInfo("new value")
+
 //            Toast.makeText(this, R.string.shuffed, Toast.LENGTH_SHORT).show()
             if (color) {
-//                view1.setBackgroundColor(Color.GREEN)
+                sensorViewModel.setBoxColor(Color.Green)
             } else {
-//                view1.setBackgroundColor(Color.RED)
+                sensorViewModel.setBoxColor(Color.Red)
             }
             color = !color
         }
@@ -173,19 +169,20 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
         if (abs(lightLevel - oldLightLevel) >= 200) {
             oldLightLevel = lightLevel
 
-//            view3.text = buildString {
-//                append(getString(R.string.new_light_value))
-//                append(" $lightLevel\n")
-//
-//                when {
-//                    lightLevel < lowThresholdLight -> append(getString(R.string.light_intensity_low))
-//                    lightLevel > highThresholdLight -> append(getString(R.string.light_intensity_high))
-//                    else -> append(getString(R.string.light_intensity_medium))
-//                }
-//
-//                append(" Intensity")
-//            }
 
+            val newText = buildString {
+                append(getString(R.string.new_light_value))
+                append(" $lightLevel\n")
+
+                when {
+                    lightLevel < lowThresholdLight -> append(getString(R.string.light_intensity_low))
+                    lightLevel > highThresholdLight -> append(getString(R.string.light_intensity_high))
+                    else -> append(getString(R.string.light_intensity_medium))
+                }
+
+                append(" Intensity")
+            }
+            sensorViewModel.changeLightInfo(newText)
         }
     }
 
@@ -193,9 +190,5 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
         // Do something here if sensor accuracy changes.
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean("savedColor", color) // save current color
-    }
 
 }
