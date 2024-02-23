@@ -4,8 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class SensorViewModel : ViewModel() {
-    private val accelerometreInfo: MutableLiveData<String> by lazy {
-        MutableLiveData<String>("")
+    val accelerometreInfo: MutableLiveData<String> by lazy {
+        MutableLiveData<String>("Default")
     }
 
     fun changeAccelerometreInfo(new: String) {

@@ -6,17 +6,21 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.widget.TextView
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Text
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.example.testaccelerometrekotlin.databinding.MainBinding
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Observer
+import com.example.testaccelerometrekotlin.ui.SensorViewModel
 import kotlin.math.abs
 
 
@@ -27,22 +31,13 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
     private var maxLight: Float = 0F
     private var oldLightLevel: Float = 0F
     private var lastUpdate: Long = 0
-    private lateinit var view1: TextView
-    private lateinit var view2: TextView
-    private lateinit var view3: TextView
 
-    private lateinit var binding: MainBinding
+
+    private val sensorViewModel: SensorViewModel by viewModels()
 
     /** Called when the activity is first created.  */
-
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        binding = MainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-
-//        view1 = binding.textView
-//        view2 = binding.textView2
-//        view3 = binding.textView3
 
         setContent {
             Column(
@@ -53,20 +48,33 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                     modifier = Modifier
                         .fillMaxWidth() // Fill the entire width
                         .weight(2f)
-                        .background(color = Color.Black)
+                        .background(color = Color.Green)
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth() // Fill the entire width
                         .weight(2f)
-                )
+                        .background(color = Color.White)
+                ) {
+                    Text(
+                        text = sensorViewModel.accelerometreInfo.value ?: "",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth() // Fill the entire width
                         .weight(1f)
+                        .background(color = Color.Yellow)
                 )
             }
         }
+
+        val sensorObserver =
+            Observer<String> { newValue ->  }
+        sensorViewModel.accelerometreInfo.observe(this, sensorObserver)
+
+        sensorViewModel.changeAccelerometreInfo("Not detected")
 
         if (savedInstanceState != null) {
             color = savedInstanceState.getBoolean(
@@ -136,6 +144,7 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
                 return
             }
             lastUpdate = actualTime
+            sensorViewModel.changeAccelerometreInfo("new value")
 //            Toast.makeText(this, R.string.shuffed, Toast.LENGTH_SHORT).show()
             if (color) {
 //                view1.setBackgroundColor(Color.GREEN)
@@ -158,18 +167,18 @@ class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
         if (abs(lightLevel - oldLightLevel) >= 200) {
             oldLightLevel = lightLevel
 
-            view3.text = buildString {
-                append(getString(R.string.new_light_value))
-                append(" $lightLevel\n")
-
-                when {
-                    lightLevel < lowThresholdLight -> append(getString(R.string.light_intensity_low))
-                    lightLevel > highThresholdLight -> append(getString(R.string.light_intensity_high))
-                    else -> append(getString(R.string.light_intensity_medium))
-                }
-
-                append(" Intensity")
-            }
+//            view3.text = buildString {
+//                append(getString(R.string.new_light_value))
+//                append(" $lightLevel\n")
+//
+//                when {
+//                    lightLevel < lowThresholdLight -> append(getString(R.string.light_intensity_low))
+//                    lightLevel > highThresholdLight -> append(getString(R.string.light_intensity_high))
+//                    else -> append(getString(R.string.light_intensity_medium))
+//                }
+//
+//                append(" Intensity")
+//            }
 
         }
     }
