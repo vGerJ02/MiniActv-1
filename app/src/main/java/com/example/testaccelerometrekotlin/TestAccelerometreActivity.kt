@@ -1,19 +1,26 @@
 package com.example.testaccelerometrekotlin
 
 
-import android.app.Activity
-import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.example.testaccelerometrekotlin.databinding.MainBinding
 import kotlin.math.abs
 
 
-class TestAccelerometreActivity : Activity(), SensorEventListener {
+class TestAccelerometreActivity : AppCompatActivity(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private var color: Boolean = false
@@ -30,12 +37,36 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+//        binding = MainBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
 
-        view1 = binding.textView
-        view2 = binding.textView2
-        view3 = binding.textView3
+//        view1 = binding.textView
+//        view2 = binding.textView2
+//        view3 = binding.textView3
+
+        setContent {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize() // Fill the entire parent container
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth() // Fill the entire width
+                        .weight(2f)
+                        .background(color = Color.Black)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth() // Fill the entire width
+                        .weight(2f)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth() // Fill the entire width
+                        .weight(1f)
+                )
+            }
+        }
 
         if (savedInstanceState != null) {
             color = savedInstanceState.getBoolean(
@@ -43,7 +74,7 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
                 false
             ) // retrieve saved color or use default
         }
-        view1.setBackgroundColor(if (!color) Color.GREEN else Color.RED)
+//        view1.setBackgroundColor(if (!color) Color.GREEN else Color.RED)
 
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
@@ -56,7 +87,7 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
 
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometer != null) {
-            view2.text = this.getString(R.string.shake)
+//            view2.text = this.getString(R.string.shake)
             sensorManager.registerListener(
                 this,
                 accelerometer,
@@ -66,7 +97,7 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
 
         val light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
         if (light != null) {
-            view3.setBackgroundColor(Color.YELLOW)
+//            view3.setBackgroundColor(Color.YELLOW)
             sensorManager.registerListener(
                 this,
                 light,
@@ -107,9 +138,9 @@ class TestAccelerometreActivity : Activity(), SensorEventListener {
             lastUpdate = actualTime
 //            Toast.makeText(this, R.string.shuffed, Toast.LENGTH_SHORT).show()
             if (color) {
-                view1.setBackgroundColor(Color.GREEN)
+//                view1.setBackgroundColor(Color.GREEN)
             } else {
-                view1.setBackgroundColor(Color.RED)
+//                view1.setBackgroundColor(Color.RED)
             }
             color = !color
         }
